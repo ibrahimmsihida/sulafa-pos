@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { formatPrice, formatDateEnglish, CURRENCIES } from '../utils/currency';
+import { formatPrice, CURRENCIES } from '../../utils/currency';
 
 ChartJS.register(
   CategoryScale,

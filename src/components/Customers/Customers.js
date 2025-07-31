@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search, Mail, Phone, MapPin, Calendar } from 'lucide-react';
-import { formatPrice } from '../utils/currency';
+import { formatPrice } from '../../utils/currency';
 
 const Customers = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency] = useState('USD');
   const [customers, setCustomers] = useState([
     // Empty array - client will add their own customers
   ]);

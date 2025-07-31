@@ -4,7 +4,6 @@ import {
   Minus, 
   ShoppingCart, 
   Search, 
-  Filter,
   X,
   CreditCard,
   DollarSign,
@@ -14,7 +13,7 @@ import {
   Save,
   Camera
 } from 'lucide-react';
-import { formatPrice, CURRENCIES } from '../utils/currency';
+import { formatPrice, CURRENCIES } from '../../utils/currency';
 
 const POS = () => {
   const [categories] = useState([

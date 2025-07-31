@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, Package, Upload, Camera, X } from 'lucide-react';
-import { formatPrice, CURRENCIES } from '../utils/currency';
+import { Plus, Edit, Trash2, Search, Upload, Camera, X } from 'lucide-react';
+import { formatPrice, CURRENCIES } from '../../utils/currency';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
