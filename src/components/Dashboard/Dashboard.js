@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { formatPrice, formatDateEnglish, CURRENCIES } from '../utils/currency';
 
 ChartJS.register(
   CategoryScale,
@@ -27,6 +28,7 @@ const Dashboard = ({ onNavigate }) => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [selectedOutlet, setSelectedOutlet] = useState('all');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const handleAddProduct = () => {
     if (onNavigate) {
@@ -45,7 +47,7 @@ const Dashboard = ({ onNavigate }) => {
     labels: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     datasets: [
       {
-        label: 'Net Sales (SAR)',
+        label: `Net Sales (${CURRENCIES[selectedCurrency].symbol})`,
         data: [0, 0, 0, 0, 0, 0, 0],
         borderColor: '#3B82F6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -160,6 +162,21 @@ const Dashboard = ({ onNavigate }) => {
               />
             </div>
             
+            {/* Currency Selection */}
+            <div className="bg-white rounded-lg border border-gray-200">
+              <select
+                value={selectedCurrency}
+                onChange={(e) => setSelectedCurrency(e.target.value)}
+                className="px-4 py-2 text-sm border-none outline-none bg-transparent rounded-lg min-w-[120px]"
+              >
+                {Object.entries(CURRENCIES).map(([code, currency]) => (
+                  <option key={code} value={code}>
+                    {currency.symbol} {currency.code}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
             {/* Outlet Selection */}
             <div className="bg-white rounded-lg border border-gray-200">
               <select
@@ -206,28 +223,28 @@ const Dashboard = ({ onNavigate }) => {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Today's Total Sales"
-          value="0.00 SAR"
+          value={formatPrice(0, selectedCurrency)}
           change="0%"
           icon="💰"
         />
         
         <StatCard
           title="Today's Net Sales"
-          value="0.00 SAR"
+          value={formatPrice(0, selectedCurrency)}
           change="0%"
           icon="📈"
         />
         
         <StatCard
           title="Today's Credit Sales"
-          value="0.00 SAR"
+          value={formatPrice(0, selectedCurrency)}
           change="0%"
           icon="💳"
         />
         
         <StatCard
           title="Yesterday's Net Sales"
-          value="0.00 SAR"
+          value={formatPrice(0, selectedCurrency)}
           change="0%"
           icon="📅"
         />

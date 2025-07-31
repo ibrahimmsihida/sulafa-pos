@@ -1,52 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { formatPrice } from '../utils/currency';
 
 const Customers = () => {
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john.doe@email.com',
-      phone: '+1 234 567 8900',
-      address: '123 Main St, City',
-      totalOrders: 15,
-      totalSpent: 450.75,
-      lastVisit: '2024-01-15',
-      loyaltyPoints: 125
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane.smith@email.com',
-      phone: '+1 234 567 8901',
-      address: '456 Oak Ave, City',
-      totalOrders: 8,
-      totalSpent: 220.50,
-      lastVisit: '2024-01-14',
-      loyaltyPoints: 68
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      email: 'mike.johnson@email.com',
-      phone: '+1 234 567 8902',
-      address: '789 Pine St, City',
-      totalOrders: 22,
-      totalSpent: 680.25,
-      lastVisit: '2024-01-13',
-      loyaltyPoints: 205
-    },
-    {
-      id: 4,
-      name: 'Sarah Wilson',
-      email: 'sarah.wilson@email.com',
-      phone: '+1 234 567 8903',
-      address: '321 Elm St, City',
-      totalOrders: 12,
-      totalSpent: 350.00,
-      lastVisit: '2024-01-12',
-      loyaltyPoints: 95
-    }
+    // Empty array - client will add their own customers
   ]);
 
   const [showModal, setShowModal] = useState(false);
@@ -157,7 +116,7 @@ const Customers = () => {
         <div className="card p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-warning-600">
-              ${customers.reduce((sum, customer) => sum + customer.totalSpent, 0).toFixed(2)}
+              {formatPrice(customers.reduce((sum, customer) => sum + customer.totalSpent, 0), selectedCurrency)}
             </p>
             <p className="text-sm text-gray-600">Total Revenue</p>
           </div>
@@ -165,7 +124,7 @@ const Customers = () => {
         <div className="card p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-secondary-600">
-              {Math.round(customers.reduce((sum, customer) => sum + customer.totalSpent, 0) / customers.length)}
+              {customers.length > 0 ? formatPrice(customers.reduce((sum, customer) => sum + customer.totalSpent, 0) / customers.length, selectedCurrency) : formatPrice(0, selectedCurrency)}
             </p>
             <p className="text-sm text-gray-600">Avg Spent</p>
           </div>

@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter, Package, Upload, Camera, X } from 'lucide-react';
+import { formatPrice, CURRENCIES } from '../utils/currency';
 
 const Products = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Grilled Chicken', price: 18.99, category: 'Main Course', stock: 25, image: '🍗' },
-    { id: 2, name: 'Caesar Salad', price: 12.50, category: 'Appetizers', stock: 15, image: '🥗' },
-    { id: 3, name: 'Chocolate Cake', price: 8.99, category: 'Desserts', stock: 8, image: '🍰' },
-    { id: 4, name: 'Fresh Orange Juice', price: 4.50, category: 'Beverages', stock: 30, image: '🍊' },
-    { id: 5, name: 'Beef Burger', price: 15.99, category: 'Main Course', stock: 12, image: '🍔' },
-    { id: 6, name: 'Garlic Bread', price: 6.99, category: 'Appetizers', stock: 20, image: '🍞' },
-  ]);
+  const [products, setProducts] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const categories = ['All', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
 
@@ -23,7 +18,9 @@ const Products = () => {
     price: '',
     category: 'Main Course',
     stock: '',
-    image: '🍽️'
+    description: '',
+    image: null,
+    imagePreview: null
   });
 
   const filteredProducts = products.filter(product => {
@@ -31,6 +28,21 @@ const Products = () => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData({
+          ...formData,
+          image: file,
+          imagePreview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,7 +55,13 @@ const Products = () => {
     if (editingProduct) {
       setProducts(products.map(product => 
         product.id === editingProduct.id 
-          ? { ...formData, id: editingProduct.id, price: parseFloat(formData.price), stock: parseInt(formData.stock) || 0 }
+          ? { 
+              ...formData, 
+              id: editingProduct.id, 
+              price: parseFloat(formData.price), 
+              stock: parseInt(formData.stock) || 0,
+              image: formData.imagePreview || editingProduct.image
+            }
           : product
       ));
       alert('Product updated successfully!');
@@ -52,7 +70,8 @@ const Products = () => {
         ...formData,
         id: Date.now(),
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock) || 0
+        stock: parseInt(formData.stock) || 0,
+        image: formData.imagePreview || '📦'
       };
       setProducts([...products, newProduct]);
       alert('Product added successfully!');
@@ -61,7 +80,15 @@ const Products = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', price: '', category: 'Main Course', stock: '', image: '🍽️' });
+    setFormData({ 
+      name: '', 
+      price: '', 
+      category: 'Main Course', 
+      stock: '', 
+      description: '',
+      image: null,
+      imagePreview: null
+    });
     setEditingProduct(null);
     setShowModal(false);
   };
@@ -73,7 +100,9 @@ const Products = () => {
       price: product.price.toString(),
       category: product.category,
       stock: product.stock.toString(),
-      image: product.image
+      description: product.description || '',
+      image: null,
+      imagePreview: product.image
     });
     setShowModal(true);
   };
@@ -115,6 +144,23 @@ const Products = () => {
               className="input pl-10"
             />
           </div>
+          
+          {/* Currency Selector */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">Currency:</label>
+            <select
+              value={selectedCurrency}
+              onChange={(e) => setSelectedCurrency(e.target.value)}
+              className="input w-24"
+            >
+              {Object.entries(CURRENCIES).map(([code, currency]) => (
+                <option key={code} value={code}>
+                  {currency.symbol}
+                </option>
+              ))}
+            </select>
+          </div>
+          
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -129,30 +175,42 @@ const Products = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map(product => (
-          <div key={product.id} className="card p-6">
-            <div className="text-center mb-4">
-              <div className="text-4xl mb-2">{product.image}</div>
-              <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
-              <p className="text-sm text-gray-600">{product.category}</p>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Price:</span>
-                <span className="font-semibold text-primary-600">${product.price}</span>
+        {filteredProducts.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No products available</h3>
+            <p className="text-gray-500 mb-4">Start by adding your first product</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn btn-primary"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Add Product
+            </button>
+          </div>
+        ) : (
+          filteredProducts.map(product => (
+            <div key={product.id} className="card p-4 hover:shadow-lg transition-shadow group">
+              <div className="text-center mb-3">
+                {product.image && product.image.startsWith('data:') ? (
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-16 h-16 mx-auto rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="text-4xl">{product.image || '📦'}</div>
+                )}
               </div>
+              <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+              <p className="text-primary font-bold text-xl mb-2">{formatPrice(product.price, selectedCurrency)}</p>
+              <p className="text-gray-600 mb-2">Category: {product.category}</p>
+              <p className="text-gray-600 mb-4">Stock: {product.stock}</p>
+              {product.description && (
+                <p className="text-gray-500 text-sm mb-4">{product.description}</p>
+              )}
               
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Stock:</span>
-                <span className={`font-semibold ${
-                  product.stock < 10 ? 'text-danger-600' : 'text-success-600'
-                }`}>
-                  {product.stock} units
-                </span>
-              </div>
-              
-              <div className="flex space-x-2 pt-3">
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleEdit(product)}
                   className="btn btn-secondary flex-1"
@@ -169,22 +227,30 @@ const Products = () => {
                 </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Add/Edit Product Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {editingProduct ? 'Edit Product' : 'Add New Product'}
-            </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {editingProduct ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Name
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Name *
                 </label>
                 <input
                   type="text"
@@ -194,10 +260,10 @@ const Products = () => {
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price ($)
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price ({CURRENCIES[selectedCurrency].symbol}) *
                 </label>
                 <input
                   type="number"
@@ -208,49 +274,95 @@ const Products = () => {
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   className="input"
+                  required
                 >
-                  {categories.slice(1).map(category => (
+                  {categories.filter(cat => cat !== 'All').map(category => (
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stock Quantity
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Stock
                 </label>
                 <input
                   type="number"
                   value={formData.stock}
                   onChange={(e) => setFormData({...formData, stock: e.target.value})}
                   className="input"
-                  required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Emoji Icon
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
                 </label>
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({...formData, image: e.target.value})}
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
                   className="input"
-                  placeholder="🍽️"
+                  rows="3"
+                  placeholder="Product description..."
                 />
               </div>
-              
-              <div className="flex space-x-3 pt-4">
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Image
+                </label>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="btn btn-secondary cursor-pointer flex items-center gap-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Upload Image
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({...formData, imagePreview: '📦', image: null})}
+                      className="btn btn-secondary flex items-center gap-2"
+                    >
+                      <Camera className="w-4 h-4" />
+                      Use Emoji
+                    </button>
+                  </div>
+                  
+                  {formData.imagePreview && (
+                    <div className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                      {formData.imagePreview.startsWith('data:') ? (
+                        <img 
+                          src={formData.imagePreview} 
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-4xl">{formData.imagePreview}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={resetForm}

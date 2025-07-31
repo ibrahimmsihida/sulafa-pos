@@ -8,8 +8,13 @@ import {
   X,
   CreditCard,
   DollarSign,
-  Receipt
+  Receipt,
+  Upload,
+  Edit,
+  Save,
+  Camera
 } from 'lucide-react';
+import { formatPrice, CURRENCIES } from '../utils/currency';
 
 const POS = () => {
   const [categories] = useState([
@@ -20,23 +25,115 @@ const POS = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
-  const [products] = useState([
-    { id: 1, name: 'Grilled Chicken', price: 18.99, category: 'Main Course', image: '🍗', description: 'Tender grilled chicken with herbs' },
-    { id: 2, name: 'Caesar Salad', price: 12.50, category: 'Appetizers', image: '🥗', description: 'Fresh romaine lettuce with caesar dressing' },
-    { id: 3, name: 'Chocolate Cake', price: 8.99, category: 'Desserts', image: '🍰', description: 'Rich chocolate cake with cream' },
-    { id: 4, name: 'Fresh Orange Juice', price: 4.50, category: 'Beverages', image: '🍊', description: 'Freshly squeezed orange juice' },
-    { id: 5, name: 'Beef Burger', price: 15.99, category: 'Main Course', image: '🍔', description: 'Juicy beef burger with fries' },
-    { id: 6, name: 'Garlic Bread', price: 6.99, category: 'Appetizers', image: '🍞', description: 'Crispy garlic bread with herbs' },
-    { id: 7, name: 'Ice Cream', price: 5.99, category: 'Desserts', image: '🍨', description: 'Vanilla ice cream with toppings' },
-    { id: 8, name: 'Coffee', price: 3.50, category: 'Beverages', image: '☕', description: 'Premium coffee blend' },
-  ]);
+  const [products, setProducts] = useState([]);
+
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: '',
+    category: 'Main Course',
+    description: '',
+    image: null,
+    imagePreview: null
+  });
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewProduct({
+          ...newProduct,
+          image: file,
+          imagePreview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddProduct = () => {
+    if (!newProduct.name || !newProduct.price) {
+      alert('Please fill in product name and price');
+      return;
+    }
+
+    const product = {
+      id: Date.now(),
+      name: newProduct.name,
+      price: parseFloat(newProduct.price),
+      category: newProduct.category,
+      description: newProduct.description,
+      image: newProduct.imagePreview || '📦'
+    };
+
+    setProducts([...products, product]);
+    setNewProduct({
+      name: '',
+      price: '',
+      category: 'Main Course',
+      description: '',
+      image: null,
+      imagePreview: null
+    });
+    setShowAddProduct(false);
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setNewProduct({
+      name: product.name,
+      price: product.price.toString(),
+      category: product.category,
+      description: product.description,
+      image: null,
+      imagePreview: product.image
+    });
+    setShowAddProduct(true);
+  };
+
+  const handleUpdateProduct = () => {
+    if (!newProduct.name || !newProduct.price) {
+      alert('Please fill in product name and price');
+      return;
+    }
+
+    const updatedProduct = {
+      ...editingProduct,
+      name: newProduct.name,
+      price: parseFloat(newProduct.price),
+      category: newProduct.category,
+      description: newProduct.description,
+      image: newProduct.imagePreview || editingProduct.image
+    };
+
+    setProducts(products.map(p => p.id === editingProduct.id ? updatedProduct : p));
+    setNewProduct({
+      name: '',
+      price: '',
+      category: 'Main Course',
+      description: '',
+      image: null,
+      imagePreview: null
+    });
+    setEditingProduct(null);
+    setShowAddProduct(false);
+  };
+
+  const deleteProduct = (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      setProducts(products.filter(p => p.id !== id));
+    }
+  };
 
   const addToCart = (product) => {
     const existingItem = cart.find(item => item.id === product.id);
@@ -88,7 +185,7 @@ const POS = () => {
     setShowCheckout(false);
     
     // Show success message
-    alert(`Order completed successfully!\nOrder Number: ${orderNumber}\nTotal Amount: $${total.toFixed(2)}\nThank you!`);
+    alert(`Order completed successfully!\nOrder Number: ${orderNumber}\nTotal Amount: ${formatPrice(total, selectedCurrency)}\nThank you!`);
   };
 
   return (
@@ -108,6 +205,32 @@ const POS = () => {
                 className="input pl-10"
               />
             </div>
+            
+            {/* Currency Selector */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Currency:</label>
+              <select
+                value={selectedCurrency}
+                onChange={(e) => setSelectedCurrency(e.target.value)}
+                className="input w-24"
+              >
+                {Object.entries(CURRENCIES).map(([code, currency]) => (
+                  <option key={code} value={code}>
+                    {currency.symbol}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Add Product Button */}
+            <button
+              onClick={() => setShowAddProduct(true)}
+              className="btn btn-primary whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </button>
+            
             <div className="flex gap-2 overflow-x-auto">
               {categories.map(category => (
                 <button
@@ -128,26 +251,71 @@ const POS = () => {
 
         {/* Products Grid */}
         <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredProducts.map(product => (
-              <div key={product.id} className="card p-4 hover:shadow-medium transition-shadow cursor-pointer">
-                <div className="text-center mb-3">
-                  <div className="text-4xl mb-2">{product.image}</div>
-                  <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{product.description}</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-primary-600">${product.price}</span>
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="btn btn-primary btn-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
+          {products.length === 0 ? (
+            <div className="flex items-center justify-center h-64 text-center">
+              <div>
+                <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">No products available</p>
+                <p className="text-sm text-gray-400 mb-4">Add your first product to get started</p>
+                <button
+                  onClick={() => setShowAddProduct(true)}
+                  className="btn btn-primary"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Product
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredProducts.map(product => (
+                <div key={product.id} className="card p-4 hover:shadow-medium transition-shadow group">
+                  <div className="text-center mb-3">
+                    <div className="relative mb-2">
+                      {product.image && product.image.startsWith('data:') ? (
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="w-16 h-16 object-cover rounded-lg mx-auto"
+                        />
+                      ) : (
+                        <div className="text-4xl">{product.image || '📦'}</div>
+                      )}
+                      
+                      {/* Edit/Delete buttons - show on hover */}
+                      <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="bg-blue-500 text-white p-1 rounded-full mr-1 hover:bg-blue-600"
+                        >
+                          <Edit className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => deleteProduct(product.id)}
+                          className="bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{product.description}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-primary-600">
+                      {formatPrice(product.price, selectedCurrency)}
+                    </span>
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -177,7 +345,7 @@ const POS = () => {
                   <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900">{item.name}</h4>
-                      <p className="text-sm text-gray-600">${item.price} each</p>
+                      <p className="text-sm text-gray-600">{formatPrice(item.price, selectedCurrency)} each</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
@@ -208,7 +376,7 @@ const POS = () => {
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-gray-900">Total:</span>
                   <span className="text-2xl font-bold text-primary-600">
-                    ${getTotalAmount().toFixed(2)}
+                    {formatPrice(getTotalAmount(), selectedCurrency)}
                   </span>
                 </div>
                 <button
@@ -265,7 +433,7 @@ const POS = () => {
             <div className="border-t border-gray-200 pt-4 mb-6">
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total Amount:</span>
-                <span className="text-primary-600">${getTotalAmount().toFixed(2)}</span>
+                <span className="text-primary-600">{formatPrice(getTotalAmount(), selectedCurrency)}</span>
               </div>
             </div>
 
@@ -282,6 +450,169 @@ const POS = () => {
               >
                 <Receipt className="w-4 h-4 mr-2" />
                 Complete Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Product Modal */}
+      {showAddProduct && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {editingProduct ? 'Edit Product' : 'Add New Product'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowAddProduct(false);
+                  setEditingProduct(null);
+                  setNewProduct({
+                    name: '',
+                    price: '',
+                    category: 'Main Course',
+                    description: '',
+                    image: null,
+                    imagePreview: null
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Product Image */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Image
+                </label>
+                <div className="flex items-center space-x-4">
+                  <div className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                    {newProduct.imagePreview ? (
+                      newProduct.imagePreview.startsWith('data:') ? (
+                        <img 
+                          src={newProduct.imagePreview} 
+                          alt="Preview"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-2xl">{newProduct.imagePreview}</div>
+                      )
+                    ) : (
+                      <Camera className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="product-image"
+                    />
+                    <label
+                      htmlFor="product-image"
+                      className="btn btn-secondary cursor-pointer"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Image
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  value={newProduct.name}
+                  onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                  className="input"
+                  placeholder="Enter product name"
+                  required
+                />
+              </div>
+
+              {/* Product Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Price ({CURRENCIES[selectedCurrency].symbol}) *
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={newProduct.price}
+                  onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                  className="input"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              {/* Product Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  value={newProduct.category}
+                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                  className="input"
+                >
+                  {categories.filter(cat => cat !== 'All').map(category => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Product Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                  className="input"
+                  rows="3"
+                  placeholder="Enter product description"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowAddProduct(false);
+                  setEditingProduct(null);
+                  setNewProduct({
+                    name: '',
+                    price: '',
+                    category: 'Main Course',
+                    description: '',
+                    image: null,
+                    imagePreview: null
+                  });
+                }}
+                className="btn btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={editingProduct ? handleUpdateProduct : handleAddProduct}
+                className="btn btn-primary flex-1"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {editingProduct ? 'Update Product' : 'Add Product'}
               </button>
             </div>
           </div>

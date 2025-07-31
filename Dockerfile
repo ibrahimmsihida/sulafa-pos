@@ -1,26 +1,26 @@
-# استخدام Node.js 18
+# Use Node.js 18
 FROM node:18-alpine
 
-# تعيين مجلد العمل
+# Set working directory
 WORKDIR /app
 
-# نسخ ملفات package
+# Copy package files
 COPY package*.json ./
 
-# تثبيت التبعيات
+# Install dependencies
 RUN npm install
 
-# نسخ باقي الملفات
+# Copy remaining files
 COPY . .
 
-# بناء المشروع
+# Build the project
 RUN npm run build
 
-# إنشاء مجلد الرفع
+# Create upload directory
 RUN mkdir -p uploads
 
-# تعيين المنفذ
+# Set port
 EXPOSE 3000 5000
 
-# تشغيل التطبيق
+# Run the application
 CMD ["node", "server.js"]

@@ -1,26 +1,26 @@
 #!/bin/bash
 
-echo "🚀 بدء عملية النشر..."
+echo "🚀 Starting deployment process..."
 
-# تثبيت التبعيات
-echo "📦 تثبيت التبعيات..."
+# Install dependencies
+echo "📦 Installing dependencies..."
 npm install
 
-# بناء المشروع
-echo "🔨 بناء المشروع..."
+# Build the project
+echo "🔨 Building the project..."
 npm run build
 
-# التحقق من وجود ملف البناء
+# Check if build directory exists
 if [ -d "build" ]; then
-    echo "✅ تم بناء المشروع بنجاح!"
+    echo "✅ Project built successfully!"
 else
-    echo "❌ فشل في بناء المشروع!"
+    echo "❌ Project build failed!"
     exit 1
 fi
 
-echo "🎉 المشروع جاهز للنشر!"
-echo "📋 الخطوات التالية:"
-echo "1. إنشاء حساب على Vercel.com"
-echo "2. ربط مستودع GitHub"
-echo "3. إضافة متغيرات البيئة"
-echo "4. النشر"
+echo "🎉 Project ready for deployment!"
+echo "📋 Next steps:"
+echo "1. Create account on Vercel.com"
+echo "2. Connect GitHub repository"
+echo "3. Add environment variables"
+echo "4. Deploy"
