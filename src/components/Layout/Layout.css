@@ -1,0 +1,279 @@
+/* SULAFA Layout Styles */
+
+/* SULAFA Logo Styles */
+.sulafa-logo {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  max-height: 40px;
+  width: auto;
+}
+
+.sulafa-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* New Logo Styles */
+.sulafa-logo-text {
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.sulafa-logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+  border: 3px solid rgba(251, 146, 60, 0.3);
+}
+
+.sulafa-logo-circle:hover {
+  border-color: rgba(255, 107, 53, 0.5);
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard logo container styling */
+.dashboard-logo-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-logo-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.dashboard-logo-container:hover::before {
+  left: 100%;
+}
+
+.dashboard-logo-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.sulafa-bakery-logo {
+  animation: logoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+  from {
+    filter: drop-shadow(0 2px 4px rgba(255, 107, 53, 0.3));
+  }
+  to {
+    filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.5));
+  }
+}
+
+.sulafa-pos-logo {
+  height: 40px;
+  width: auto;
+}
+
+.sulafa-pvt-logo {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 120px;
+  height: auto;
+}
+
+.sulafa-pvt-logo:hover {
+  opacity: 1 !important;
+  transform: translateY(-2px);
+}
+
+/* Mode Switch Styles */
+.mode-switch-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.mode-switch-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.mode-switch-button.active {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.mode-switch-button:not(.active) {
+  color: #64748b;
+}
+
+.mode-switch-button:not(.active):hover {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Sidebar enhancements */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
+  border-radius: 0.5rem;
+  color: #6b7280;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.sidebar-item:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+  transform: translateX(-4px);
+}
+
+.sidebar-item.active {
+  background-color: #ff6b35;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.sidebar-item.active:hover {
+  background-color: #e55a2b;
+  transform: translateX(0);
+}
+
+/* Header improvements */
+.header-logo-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeInLeft 0.6s ease-out;
+}
+
+/* Brand colors */
+:root {
+  --sulafa-primary: #ff6b35;
+  --sulafa-secondary: #b8860b;
+  --sulafa-brown: #8b4513;
+  --sulafa-gold: #b8860b;
+}
+
+/* Login page enhancements */
+.login-logo-container {
+  position: relative;
+  display: inline-block;
+  padding: 20px;
+}
+
+.login-logo-container::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: linear-gradient(45deg, var(--sulafa-primary), var(--sulafa-secondary));
+  border-radius: 20px;
+  opacity: 0.08;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.login-logo-container .sulafa-logo {
+  filter: drop-shadow(0 4px 12px rgba(255, 107, 53, 0.2));
+  transition: all 0.3s ease;
+}
+
+.login-logo-container:hover .sulafa-logo {
+  transform: scale(1.02);
+  filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.3));
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+}
+
+/* Footer logo styling */
+.footer-logo {
+  transition: all 0.3s ease;
+  filter: grayscale(20%);
+  border: 3px solid rgba(255, 107, 53, 0.2);
+}
+
+.footer-logo:hover {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+  border-color: rgba(255, 107, 53, 0.4);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sulafa-logo {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+  
+  .login-logo-container img {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+}
+
+/* Loading animation for logos */
+.logo-loading {
+  animation: logoSpin 2s linear infinite;
+}
+
+@keyframes logoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced card styles */
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}

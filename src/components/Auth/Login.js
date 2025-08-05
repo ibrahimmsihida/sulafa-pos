@@ -51,11 +51,15 @@ const Login = ({ onLogin }) => {
       <div className="max-w-md w-full">
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
-            <ChefHat className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center mb-6 login-logo-container">
+            <img 
+              src="/images/sulafa-logo-text.png" 
+              alt="SULAFA" 
+              className="h-32 sulafa-logo"
+              style={{maxWidth: '320px', objectFit: 'contain'}}
+            />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">SULAFA PVT LTD</h1>
-          <p className="text-gray-600">Restaurant Management System</p>
+          <p className="text-gray-600 text-lg">Sign in to your account</p>
         </div>
 
         {/* Login Form */}
@@ -132,6 +136,14 @@ const Login = ({ onLogin }) => {
 
         {/* Footer */}
         <div className="text-center mt-8">
+          <div className="flex items-center justify-center mb-4">
+            <img 
+              src="/images/sulafa-logo-circle.png" 
+              alt="SULAFA" 
+              className="h-16 w-16 opacity-80 footer-logo sulafa-logo rounded-full shadow-lg"
+              style={{objectFit: 'cover'}}
+            />
+          </div>
           <p className="text-sm text-gray-500">
             © 2024 SULAFA PVT LTD. All rights reserved.
           </p>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Mail, Phone, MapPin, Calendar } from 'lucide-react';
-import { formatPrice } from '../../utils/currency';
+import { Search, Plus, Edit, Trash2, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { formatPrice, convertToEnglishNumbers } from '../../utils/currency';
 
 const Customers = () => {
   const [selectedCurrency] = useState('USD');
@@ -167,7 +167,7 @@ const Customers = () => {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="w-4 h-4 mr-2" />
-                    Last visit: {new Date(customer.lastVisit).toLocaleDateString()}
+                    Last visit: {convertToEnglishNumbers(new Date(customer.lastVisit).toLocaleDateString())}
                   </div>
                 </div>
               </div>

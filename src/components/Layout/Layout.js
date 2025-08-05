@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import './Layout.css';
+import ModeSwitch from './ModeSwitch';
 import { 
   ChefHat, 
   LayoutDashboard, 
@@ -13,27 +15,45 @@ import {
   Menu,
   X,
   Bell,
-  Search
+  Search,
+  ShoppingBag,
+  Utensils,
+  Inventory,
+  CreditCard
 } from 'lucide-react';
 
 const Layout = ({ children, user, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentMode, setCurrentMode] = useState('restaurant');
   const location = useLocation();
 
-  const navigation = [
+  const restaurantNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'POS System', href: '/pos', icon: ShoppingCart },
-    { name: 'Products', href: '/products', icon: Package },
+    { name: 'POS System', href: '/pos', icon: Utensils },
+    { name: 'Menu Items', href: '/products', icon: Package },
     { name: 'Orders', href: '/orders', icon: ClipboardList },
     { name: 'Customers', href: '/customers', icon: Users },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
+  const retailNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'POS System', href: '/pos', icon: CreditCard },
+    { name: 'Products', href: '/products', icon: ShoppingBag },
+    { name: 'Inventory', href: '/inventory', icon: Inventory },
+    { name: 'Sales', href: '/orders', icon: ClipboardList },
+    { name: 'Customers', href: '/customers', icon: Users },
+    { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ];
+
+  const navigation = currentMode === 'restaurant' ? restaurantNavigation : retailNavigation;
+
   const isActive = (href) => location.pathname === href;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex" dir="ltr">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -45,15 +65,12 @@ const Layout = ({ children, user, onLogout }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        sidebarOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-primary-600 rounded-lg">
-              <ChefHat className="w-5 h-5 text-white" />
-            </div>
-            <span className="ml-3 text-xl font-bold text-gray-900">SULAFA</span>
+            <h2 className="text-lg font-semibold text-gray-900">SULAFA POS</h2>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -61,6 +78,14 @@ const Layout = ({ children, user, onLogout }) => {
           >
             <X className="w-6 h-6" />
           </button>
+        </div>
+
+        {/* Mode Switch in Sidebar */}
+        <div className="px-3 py-4 border-b border-gray-100">
+          <ModeSwitch 
+            currentMode={currentMode} 
+            onModeChange={setCurrentMode} 
+          />
         </div>
 
         <nav className="mt-6 px-3">
@@ -83,11 +108,23 @@ const Layout = ({ children, user, onLogout }) => {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          {/* SULAFA Circle Logo */}
+          <div className="flex items-center justify-center mb-4 pb-4 border-b border-gray-100">
+            <img 
+              src="/images/sulafa-logo-circle.png" 
+              alt="SULAFA" 
+              className="h-12 w-12 opacity-90 sulafa-logo sulafa-circle-logo rounded-full"
+              style={{objectFit: 'cover'}}
+            />
+          </div>
+          
           <div className="flex items-center mb-4">
-            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-primary-600 font-medium text-sm">
-                {user?.name?.charAt(0) || 'A'}
-              </span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+              <img 
+                src="/images/sulafa-logo-circle.png" 
+                alt="SULAFA" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-900">{user?.name}</p>
@@ -105,7 +142,7 @@ const Layout = ({ children, user, onLogout }) => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+        <div className="flex-1 lg:pr-64">
         {/* Top header */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between h-16 px-6">
@@ -122,6 +159,40 @@ const Layout = ({ children, user, onLogout }) => {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Logo in Top Right */}
+              <div className="flex items-center mr-4">
+                <div className="relative">
+                  <img 
+                    src="/images/sulafa-logo-text.png" 
+                    alt="Sulafa Logo" 
+                    className="h-20 object-contain transition-all duration-300 hover:scale-105"
+                    style={{ 
+                      maxWidth: '400px',
+                      filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25))'
+                    }}
+                    onError={(e) => {
+                      console.log('Logo failed to load:', e.target.src);
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                    onLoad={() => {
+                      console.log('Logo loaded successfully');
+                    }}
+                  />
+                  <div 
+                    className="h-20 flex items-center justify-center bg-blue-600 text-white px-8 rounded-lg font-bold text-2xl"
+                    style={{ display: 'none', minWidth: '250px' }}
+                  >
+                    SULAFA POS
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mode Switch */}
+              <ModeSwitch 
+                currentMode={currentMode} 
+                onModeChange={setCurrentMode} 
+              />
               {/* Search */}
               <div className="hidden md:block relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -140,10 +211,12 @@ const Layout = ({ children, user, onLogout }) => {
 
               {/* User menu */}
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-primary-600 font-medium text-sm">
-                    {user?.name?.charAt(0) || 'A'}
-                  </span>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/sulafa-logo-circle.png" 
+                    alt="SULAFA" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -155,6 +228,8 @@ const Layout = ({ children, user, onLogout }) => {
           {children}
         </main>
       </div>
+
+
     </div>
   );
 };

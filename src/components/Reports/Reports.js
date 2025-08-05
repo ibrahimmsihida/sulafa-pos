@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart3, TrendingUp, Calendar, Download, Filter } from 'lucide-react';
+import { convertToEnglishNumbers } from '../../utils/currency';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -352,7 +353,7 @@ const Reports = () => {
               ].map((row, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(row.date).toLocaleDateString()}
+                    {convertToEnglishNumbers(new Date(row.date).toLocaleDateString())}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {row.orders}

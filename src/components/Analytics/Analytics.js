@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart3, TrendingUp, PieChart, Activity, Calendar, Download, Filter, RefreshCw } from 'lucide-react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { convertToEnglishNumbers } from '../../utils/currency';
 
 const Analytics = () => {
   const [timeRange, setTimeRange] = useState('week');
@@ -16,7 +17,7 @@ const Analytics = () => {
       timeRange,
       kpis,
       topProducts,
-      exportDate: new Date().toLocaleDateString('en-US')
+      exportDate: convertToEnglishNumbers(new Date().toLocaleDateString('en-US'))
     };
     
     console.log('Exporting analytics report:', reportData);

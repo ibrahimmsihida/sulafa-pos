@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120" width="300" height="120">
+  <defs>
+    <style>
+      .pvt-arabic { fill: #B8860B; font-family: 'Arial', sans-serif; font-weight: bold; }
+      .pvt-english { fill: #000; font-family: 'Arial Black', Arial, sans-serif; font-weight: bold; }
+      .pvt-circle-outer { fill: #B8860B; }
+      .pvt-circle-inner { fill: #8B7355; }
+      .pvt-leaf { fill: #B8860B; }
+      .pvt-dots { fill: #B8860B; }
+    </style>
+  </defs>
+  
+  <!-- Arabic text "سلافة" -->
+  <text x="20" y="45" class="pvt-arabic" font-size="28">سلافة</text>
+  
+  <!-- Three dots -->
+  <circle cx="25" r="3" cy="65" class="pvt-dots"/>
+  <circle cx="35" r="3" cy="65" class="pvt-dots"/>
+  <circle cx="45" r="3" cy="65" class="pvt-dots"/>
+  
+  <!-- Circular logo design -->
+  <g transform="translate(180, 20)">
+    <!-- Outer circle -->
+    <circle cx="40" cy="40" r="35" class="pvt-circle-outer"/>
+    
+    <!-- Inner circle -->
+    <circle cx="40" cy="40" r="25" class="pvt-circle-inner"/>
+    
+    <!-- Leaf/coffee bean design -->
+    <g transform="translate(30, 25)">
+      <ellipse cx="10" cy="15" rx="8" ry="18" class="pvt-leaf" transform="rotate(-15)"/>
+      <path d="M 8 10 Q 15 15 8 25" fill="none" stroke="#fff" stroke-width="1.5"/>
+    </g>
+    
+    <!-- Decorative swirl -->
+    <path d="M 55 25 Q 65 35 55 45 Q 70 50 75 40" fill="none" stroke="#B8860B" stroke-width="3"/>
+  </g>
+  
+  <!-- English text "SULAFA PVT LTD" -->
+  <text x="20" y="100" class="pvt-english" font-size="18">SULAFA PVT LTD</text>
+</svg>

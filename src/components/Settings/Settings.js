@@ -489,8 +489,14 @@ const SettingsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
           <p className="text-gray-600">Manage your restaurant system settings</p>
         </div>
-        <button onClick={handleSave} className="btn btn-primary">
-          <Save className="w-4 h-4 mr-2" />
+        <button 
+          onClick={handleSave} 
+          className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all hover:scale-105 shadow-sm"
+        >
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586l-1.293-1.293z"/>
+            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4z"/>
+          </svg>
           Save Changes
         </button>
       </div>
@@ -506,13 +512,13 @@ const SettingsPage = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${
                       activeTab === tab.id
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-200'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm'
                     }`}
                   >
-                    <Icon className="w-4 h-4 mr-3" />
+                    <Icon className="w-5 h-5 mr-3" />
                     {tab.name}
                   </button>
                 );
