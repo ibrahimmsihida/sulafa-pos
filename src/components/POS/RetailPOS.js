@@ -614,6 +614,7 @@ const RetailPOS = () => {
    };
 
   return (
+    <>
     <div className="flex h-[calc(100vh-8rem)] gap-6">
         {/* Products Section */}
         <div className="flex-1 flex flex-col">
@@ -1614,7 +1615,7 @@ const RetailPOS = () => {
             </div>
           </div>
         )}
-    </div>
+    </>
   );
 };
 
