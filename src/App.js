@@ -25,32 +25,59 @@ function App() {
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
+    try {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        const parsedUser = JSON.parse(userData);
+        if (parsedUser && parsedUser.id) {
+          setIsAuthenticated(true);
+          setUser(parsedUser);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      // Clear corrupted data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }, []);
 
   const handleLogin = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setIsAuthenticated(true);
-    setUser(userData);
+    try {
+      if (!userData || !token) {
+        console.error('Invalid login data provided');
+        return;
+      }
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setIsAuthenticated(true);
+      setUser(userData);
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Login failed. Please try again.');
+    }
   };
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to log out?')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setIsAuthenticated(false);
-      setUser(null);
-      setCurrentPage('dashboard');
-      
-      alert('Logged out successfully!');
-      console.log('User logged out successfully');
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsAuthenticated(false);
+        setUser(null);
+        setCurrentPage('dashboard');
+        
+        console.log('User logged out successfully');
+      } catch (error) {
+        console.error('Error during logout:', error);
+        // Force logout even if there's an error
+        setIsAuthenticated(false);
+        setUser(null);
+        setCurrentPage('dashboard');
+      }
     }
   };
 

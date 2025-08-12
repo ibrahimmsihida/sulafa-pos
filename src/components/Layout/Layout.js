@@ -45,6 +45,7 @@ const Layout = ({ children, user, onLogout }) => {
     { name: 'Sales', href: '/orders', icon: ClipboardList },
     { name: 'Customers', href: '/customers', icon: Users },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Company', href: '/company', icon: Settings },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
@@ -210,13 +211,13 @@ const Layout = ({ children, user, onLogout }) => {
               </button>
 
               {/* User menu */}
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/sulafa-logo-circle.png" 
-                    alt="SULAFA" 
-                    className="w-full h-full object-cover"
-                  />
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-blue-100 border-2 border-blue-200">
+                  <span className="text-xl font-semibold text-blue-600">A</span>
+                </div>
+                <div className="hidden md:block">
+                  <p className="text-sm font-medium text-gray-900">Admin User</p>
+                  <p className="text-xs text-gray-500">System Administrator</p>
                 </div>
               </div>
             </div>

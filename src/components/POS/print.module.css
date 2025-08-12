@@ -1,0 +1,133 @@
+/* Print styles module */
+@media print {
+  /* Hide all content by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only invoice/report content */
+  #invoice-content,
+  #invoice-content *,
+  #report-content,
+  #report-content * {
+    visibility: visible;
+  }
+
+  /* Position the invoice/report content */
+  #invoice-content,
+  #report-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    background-color: white !important;
+  }
+
+  /* Hide non-printable elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 {
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin-bottom: 0.25rem;
+  }
+
+  /* Force background colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 0.5cm;
+  }
+  /* Hide all elements by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only invoice/report content */
+  #invoice-content,
+  #invoice-content *,
+  #report-content,
+  #report-content * {
+    visibility: visible;
+  }
+
+  /* Position the content */
+  #invoice-content,
+  #report-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide non-printable elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Improve table layout */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Enhance typography */
+  h1, h2, h3 {
+    margin-bottom: 1rem;
+  }
+
+  /* Force background colors and images */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Ensure proper margins */
+  @page {
+    margin: 2cm;
+  }
+}

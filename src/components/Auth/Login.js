@@ -15,6 +15,13 @@ const Login = ({ onLogin }) => {
     setLoading(true);
     setError('');
 
+    // Basic validation
+    if (!formData.username.trim() || !formData.password.trim()) {
+      setError('Please enter both username and password');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -27,13 +34,14 @@ const Login = ({ onLogin }) => {
           email: 'admin@sulafa.com',
           role: 'admin'
         };
-        const token = 'mock-jwt-token';
+        const token = 'mock-jwt-token-' + Date.now();
         onLogin(userData, token);
       } else {
-        setError('Invalid username or password');
+        setError('Invalid username or password. Please check your credentials.');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError('Login failed. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
