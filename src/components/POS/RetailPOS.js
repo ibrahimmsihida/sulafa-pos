@@ -6,6 +6,7 @@ import Cart from './components/Cart';
 import ProductGrid from './components/ProductGrid';
 import Invoice from './components/Invoice';
 import DailyReport from './components/DailyReport';
+import './print.module.css';
 
 // Create CartContext
 export const CartContext = createContext();
@@ -48,9 +49,6 @@ const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-
-// Import print styles from CSS module
-import './print.module.css';
 
 const RetailPOS = () => {
   // Wrap the component with CartProvider
