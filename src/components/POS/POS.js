@@ -27,8 +27,17 @@ const POS = () => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [notification, setNotification] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [taxRate, setTaxRate] = useState(10); // 10% tax rate
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [products, setProducts] = useState([]);
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
 
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -62,7 +71,7 @@ const POS = () => {
 
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.price) {
-      alert('Please fill in product name and price');
+      showNotification('Please fill in product name and price');
       return;
     }
 
@@ -85,6 +94,7 @@ const POS = () => {
       imagePreview: null
     });
     setShowAddProduct(false);
+    showNotification('Product added successfully!');
   };
 
   const handleEditProduct = (product) => {
@@ -177,7 +187,87 @@ const POS = () => {
     
     // Simulate order processing
     const orderNumber = '#' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const total = getTotalAmount();
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * (taxRate / 100);
+    const total = subtotal + tax;
+    
+    // Add bill to Bill History
+    const billData = {
+      billNumber: `BILL-${Date.now()}`,
+      customerName: selectedCustomer?.name || 'Walk-in Customer',
+      customerPhone: selectedCustomer?.phone || 'N/A',
+      items: cart.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity
+      })),
+      subtotal: subtotal,
+      tax: tax,
+      discount: 0,
+      total: total,
+      paymentMethod: paymentMethod || 'cash',
+      status: 'completed',
+      cashierName: 'Current User',
+      tableNumber: Math.floor(Math.random() * 20) + 1,
+      orderType: 'dine-in'
+    };
+    
+    // Save to Bill History
+    const existingBills = JSON.parse(localStorage.getItem('billHistory') || '[]');
+    const updatedBills = [...existingBills, billData];
+    localStorage.setItem('billHistory', JSON.stringify(updatedBills));
+    
+    // Update customer data if customer exists
+    if (selectedCustomer?.name && selectedCustomer.name.trim() !== '' && selectedCustomer.name !== 'Walk-in Customer') {
+      if (window.updateCustomerData) {
+        window.updateCustomerData(selectedCustomer.name, total);
+      }
+    }
+    
+    // Add transaction to current register session
+    const registerSessions = JSON.parse(localStorage.getItem('registerSessions') || '[]');
+    const activeSession = registerSessions.find(session => session.status === 'open');
+    if (activeSession) {
+      const transaction = {
+        id: Date.now(),
+        type: 'sale',
+        amount: total,
+        description: `Sale - Bill ${billData.billNumber}`,
+        timestamp: new Date().toISOString(),
+        paymentMethod: paymentMethod
+      };
+      
+      activeSession.transactions = activeSession.transactions || [];
+      activeSession.transactions.push(transaction);
+      activeSession.totalSales = (activeSession.totalSales || 0) + total;
+      
+      if (paymentMethod === 'cash') {
+        activeSession.currentCash = (activeSession.currentCash || activeSession.openingAmount) + total;
+      }
+      
+      localStorage.setItem('registerSessions', JSON.stringify(registerSessions));
+    }
+    
+    // If payment is online, add to Online Payments
+    if (paymentMethod === 'card' || paymentMethod === 'online') {
+      const paymentData = {
+        transactionId: `txn_${Date.now()}`,
+        customerName: selectedCustomer?.name || 'Walk-in Customer',
+        customerEmail: selectedCustomer?.email || 'customer@example.com',
+        amount: total,
+        currency: selectedCurrency,
+        status: 'completed',
+        paymentMethod: paymentMethod === 'card' ? 'credit_card' : 'paypal',
+        description: `Payment for Bill ${billData.billNumber}`,
+        fees: total * 0.029, // 2.9% processing fee
+        netAmount: total * 0.971
+      };
+      
+      const existingPayments = JSON.parse(localStorage.getItem('onlinePayments') || '[]');
+      const updatedPayments = [...existingPayments, paymentData];
+      localStorage.setItem('onlinePayments', JSON.stringify(updatedPayments));
+    }
     
     // Clear cart and close modal
     setCart([]);
@@ -410,20 +500,39 @@ const POS = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Customer Name
                 </label>
-                <input type="text" className="input" placeholder="Enter customer name" />
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="Enter customer name"
+                  value={selectedCustomer?.name || ''}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, name: e.target.value})}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Method
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button className="btn btn-secondary">
+                <div className="grid grid-cols-3 gap-2">
+                  <button 
+                    className={`btn ${paymentMethod === 'cash' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setPaymentMethod('cash')}
+                  >
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Cash
+                  </button>
+                  <button 
+                    className={`btn ${paymentMethod === 'card' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setPaymentMethod('card')}
+                  >
                     <CreditCard className="w-4 h-4 mr-2" />
                     Card
                   </button>
-                  <button className="btn btn-secondary">
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Cash
+                  <button 
+                    className={`btn ${paymentMethod === 'online' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setPaymentMethod('online')}
+                  >
+                    <Receipt className="w-4 h-4 mr-2" />
+                    Online
                   </button>
                 </div>
               </div>

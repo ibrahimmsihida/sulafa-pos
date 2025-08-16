@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
-import { DollarSign, Receipt, CreditCard, TrendingUp, TrendingDown, Plus, Search, Filter, Calendar } from 'lucide-react';
+import { DollarSign, Receipt, CreditCard, TrendingUp, TrendingDown, Plus, Search, Filter, Calendar, Download } from 'lucide-react';
+import { formatPrice } from '../../utils/currency';
 
 const Expenses = () => {
+  const [notification, setNotification] = useState('');
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showReportsModal, setShowReportsModal] = useState(false);
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
   // Functions for button actions
   const handleMonthlyReport = () => {
     const reportData = expenses.map(expense => 
@@ -20,32 +32,57 @@ const Expenses = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
     
-    alert('Monthly report exported successfully!');
+    showNotification('Monthly report exported successfully!');
   };
 
   const handleAddExpense = () => {
-    alert('Opening add new expense window');
-    console.log('Opening add expense modal');
+    setShowExpenseModal(true);
   };
 
   const handleAddNewExpense = () => {
-    alert('Add new expense');
-    console.log('Adding new expense');
+    setShowExpenseModal(true);
   };
 
   const handleUploadReceipt = () => {
-    alert('Upload receipt');
-    console.log('Uploading receipt');
+    setShowReceiptModal(true);
   };
 
   const handleSchedulePayment = () => {
-    alert('Schedule payment');
-    console.log('Scheduling payment');
+    setShowPaymentModal(true);
   };
 
   const handleViewReports = () => {
-    alert('View expense reports');
-    console.log('Viewing expense reports');
+    setShowReportsModal(true);
+  };
+
+  const handleDownloadInventory = () => {
+    // Sample inventory data
+    const inventoryItems = [
+      { id: 1, name: 'Fresh Vegetables', category: 'Raw Materials', quantity: 50, unit: 'kg', cost: 25.50, supplier: 'Local Farm', lastUpdated: '2024-01-15' },
+      { id: 2, name: 'Cooking Oil', category: 'Raw Materials', quantity: 20, unit: 'liters', cost: 15.75, supplier: 'Oil Supplier Co.', lastUpdated: '2024-01-14' },
+      { id: 3, name: 'Spices Mix', category: 'Seasonings', quantity: 10, unit: 'kg', cost: 45.00, supplier: 'Spice Trading', lastUpdated: '2024-01-13' },
+      { id: 4, name: 'Rice', category: 'Grains', quantity: 100, unit: 'kg', cost: 35.25, supplier: 'Rice Mills', lastUpdated: '2024-01-12' },
+      { id: 5, name: 'Chicken', category: 'Meat', quantity: 30, unit: 'kg', cost: 85.50, supplier: 'Fresh Meat Co.', lastUpdated: '2024-01-11' }
+    ];
+
+    const csvHeader = 'ID,Name,Category,Quantity,Unit,Cost (MVR),Supplier,Last Updated\n';
+    const csvContent = inventoryItems.map(item => 
+      `${item.id},${item.name},${item.category},${item.quantity},${item.unit},${formatPrice(item.cost, 'MVR')},${item.supplier},${item.lastUpdated}`
+    ).join('\n');
+    
+    const fullCsvContent = csvHeader + csvContent;
+    
+    const blob = new Blob([fullCsvContent], { type: 'text/csv;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `inventory-items-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Inventory items downloaded successfully!');
   };
   const [expenses] = useState([
     {
@@ -123,6 +160,10 @@ const Expenses = () => {
           <p className="text-gray-600">Track and manage all restaurant expenses</p>
         </div>
         <div className="flex items-center space-x-3 space-x-reverse">
+          <button onClick={handleDownloadInventory} className="btn btn-outline">
+            <Download className="w-4 h-4 mr-2" />
+            Download Inventory
+          </button>
           <button onClick={handleMonthlyReport} className="btn btn-outline">
             <Calendar className="w-4 h-4 mr-2" />
             Monthly Report
@@ -143,7 +184,7 @@ const Expenses = () => {
             </div>
             <div className="mr-4">
               <p className="text-sm text-gray-600">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">{totalExpenses.toLocaleString()} SAR</p>
+              <p className="text-2xl font-bold text-gray-900">{formatPrice(totalExpenses)}</p>
             </div>
           </div>
         </div>
@@ -155,7 +196,7 @@ const Expenses = () => {
             </div>
             <div className="mr-4">
               <p className="text-sm text-gray-600">Paid Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">{paidExpenses.toLocaleString()} SAR</p>
+              <p className="text-2xl font-bold text-gray-900">{formatPrice(paidExpenses)}</p>
             </div>
           </div>
         </div>
@@ -167,7 +208,7 @@ const Expenses = () => {
             </div>
             <div className="mr-4">
               <p className="text-sm text-gray-600">Pending Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingExpenses.toLocaleString()} SAR</p>
+              <p className="text-2xl font-bold text-gray-900">{formatPrice(pendingExpenses)}</p>
             </div>
           </div>
         </div>
@@ -195,7 +236,7 @@ const Expenses = () => {
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">{category.name}</span>
-                  <span className="text-sm text-gray-600">{category.amount.toLocaleString()} SAR</span>
+                  <span className="text-sm text-gray-600">{formatPrice(category.amount)}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
@@ -295,7 +336,7 @@ const Expenses = () => {
                       {expense.category}
                     </span>
                   </td>
-                  <td className="py-4 px-4 font-semibold">{expense.amount.toLocaleString()} SAR</td>
+                  <td className="py-4 px-4 font-semibold">{formatPrice(expense.amount)}</td>
                   <td className="py-4 px-4 text-gray-600">{expense.vendor}</td>
                   <td className="py-4 px-4 text-gray-600">{expense.paymentMethod}</td>
                   <td className="py-4 px-4">

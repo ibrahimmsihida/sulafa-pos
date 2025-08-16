@@ -28,7 +28,7 @@ const Dashboard = ({ onNavigate, businessMode = 'restaurant' }) => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [selectedOutlet, setSelectedOutlet] = useState('all');
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency, setSelectedCurrency] = useState('MVR');
 
   const handleAddProduct = () => {
     if (onNavigate) {

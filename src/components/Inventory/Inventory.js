@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import { Package, AlertTriangle, TrendingUp, TrendingDown, Plus, Search, Filter, Download } from 'lucide-react';
 
 const Inventory = () => {
+  const [notification, setNotification] = useState('');
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
   // Functions for button actions
   const handleExport = () => {
     const inventoryReport = inventoryData.map(item => 
-      `${item.name},${item.sku},${item.category},${item.stock},${item.minStock},${item.status},${item.lastUpdated}`
+      `${item.name},${item.category},${item.currentStock},${item.minStock},${item.status},${item.lastUpdated}`
     ).join('\n');
     
-    const csvContent = `Product Name,SKU,Category,Stock,Min Stock,Status,Last Updated\n${inventoryReport}`;
+    const csvContent = `Product Name,Category,Stock,Min Stock,Status,Last Updated\n${inventoryReport}`;
     
     const blob = new Blob([csvContent], { type: 'text/plain;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
@@ -20,17 +28,16 @@ const Inventory = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
     
-    alert('Inventory report exported successfully!');
+    showNotification('Inventory report exported successfully!');
   };
 
   const handleReceiveGoods = () => {
-    alert('Opening receive goods window');
-    console.log('Opening receive goods modal');
+    setShowReceiveModal(true);
   };
 
   const handleRequestRestock = (productName) => {
     if (window.confirm(`Do you want to request restock for ${productName}?`)) {
-      alert(`Restock request for ${productName} sent successfully!`);
+      showNotification(`Restock request for ${productName} sent successfully!`);
       console.log(`Restock requested for: ${productName}`);
     }
   };

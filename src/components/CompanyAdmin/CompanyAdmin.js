@@ -5,61 +5,89 @@ const CompanyAdmin = () => {
   const [activeTab, setActiveTab] = useState('employees');
   const [searchTerm, setSearchTerm] = useState('');
 
+  // State for modals and forms
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+
   // Functions for button actions
   const handleFilter = () => {
-    alert('Opening filter dialog');
+    setShowFilter(!showFilter);
   };
 
   const handleAddEmployee = () => {
-    alert('Adding new employee');
+    setSelectedEmployee(null);
+    setShowEmployeeModal(true);
   };
 
   const handleAddUser = () => {
-    alert('Adding new user');
+    setSelectedUser(null);
+    setShowUserModal(true);
   };
 
   const handleAddLocation = () => {
-    alert('Adding new location');
+    setSelectedLocation(null);
+    setShowLocationModal(true);
   };
 
   const handleViewEmployee = (employeeName) => {
-    alert(`Viewing employee details: ${employeeName}`);
+    const employee = employees.find(emp => emp.name === employeeName);
+    setSelectedEmployee(employee);
+    setShowEmployeeModal(true);
   };
 
   const handleEditEmployee = (employeeName) => {
-    alert(`Editing employee: ${employeeName}`);
+    const employee = employees.find(emp => emp.name === employeeName);
+    setSelectedEmployee(employee);
+    setShowEmployeeModal(true);
   };
 
   const handleDeleteEmployee = (employeeName) => {
     if (window.confirm(`Do you want to delete employee ${employeeName}?`)) {
-      alert(`Employee ${employeeName} deleted successfully!`);
+      // Here you would typically call an API to delete the employee
+      console.log(`Employee ${employeeName} deleted successfully!`);
     }
   };
 
   const handleUserSettings = (userName) => {
-    alert(`User settings: ${userName}`);
+    const user = systemUsers.find(u => u.name === userName);
+    setSelectedUser(user);
+    setShowUserModal(true);
   };
 
   const handleEditUser = (userName) => {
-    alert(`Editing user: ${userName}`);
+    const user = systemUsers.find(u => u.name === userName);
+    setSelectedUser(user);
+    setShowUserModal(true);
   };
 
   const handleDeleteUser = (userName) => {
     if (window.confirm(`Do you want to delete user ${userName}?`)) {
-      alert(`User ${userName} deleted successfully!`);
+      // Here you would typically call an API to delete the user
+      console.log(`User ${userName} deleted successfully!`);
     }
   };
 
   const handleViewLocationDetails = (locationName) => {
-    alert(`Viewing location details: ${locationName}`);
+    const location = locations.find(loc => loc.name === locationName);
+    setSelectedLocation(location);
+    setShowLocationModal(true);
   };
 
   const handleEditLocation = (locationName) => {
-    alert(`Editing location: ${locationName}`);
+    const location = locations.find(loc => loc.name === locationName);
+    setSelectedLocation(location);
+    setShowLocationModal(true);
   };
 
   const handleLocationOptions = (locationName) => {
-    alert(`Location options: ${locationName}`);
+    const location = locations.find(loc => loc.name === locationName);
+    setSelectedLocation(location);
+    setShowLocationModal(true);
   };
 
   // Sample data

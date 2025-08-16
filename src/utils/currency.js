@@ -1,33 +1,20 @@
 // Currency utility for SULAFA POS System
 export const CURRENCIES = {
-  USD: { symbol: '$', name: 'US Dollar', code: 'USD' },
-  EUR: { symbol: '€', name: 'Euro', code: 'EUR' },
-  SAR: { symbol: 'ر.س', name: 'Saudi Riyal', code: 'SAR' },
-  AED: { symbol: 'د.إ', name: 'UAE Dirham', code: 'AED' },
-  GBP: { symbol: '£', name: 'British Pound', code: 'GBP' },
-  JPY: { symbol: '¥', name: 'Japanese Yen', code: 'JPY' },
-  CAD: { symbol: 'C$', name: 'Canadian Dollar', code: 'CAD' },
-  AUD: { symbol: 'A$', name: 'Australian Dollar', code: 'AUD' }
+  MVR: { symbol: 'MVR', name: 'Maldivian Rufiyaa', code: 'MVR' }
 };
 
 // Get currency based on user's location or preference
-export const getCurrencyByRegion = (region = 'US') => {
+export const getCurrencyByRegion = (region = 'MV') => {
   const regionCurrencyMap = {
-    'US': 'USD',
-    'EU': 'EUR', 
-    'SA': 'SAR',
-    'AE': 'AED',
-    'GB': 'GBP',
-    'JP': 'JPY',
-    'CA': 'CAD',
-    'AU': 'AUD'
+    'MV': 'MVR',
+    'MALDIVES': 'MVR'
   };
   
-  return regionCurrencyMap[region] || 'USD';
+  return regionCurrencyMap[region] || 'MVR';
 };
 
 // Format price with currency
-export const formatPrice = (amount, currencyCode = 'USD') => {
+export const formatPrice = (amount, currencyCode = 'MVR') => {
   const currency = CURRENCIES[currencyCode];
   if (!currency) return `${amount}`;
   
@@ -37,7 +24,7 @@ export const formatPrice = (amount, currencyCode = 'USD') => {
     maximumFractionDigits: 2
   }).format(amount);
   
-  return `${currency.symbol}${formattedAmount}`;
+  return `${currency.symbol} ${formattedAmount}`;
 };
 
 // Convert Arabic numerals to English numerals

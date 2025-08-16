@@ -6,7 +6,7 @@ const ModeSwitch = ({ currentMode, onModeChange }) => {
     {
       id: 'restaurant',
       name: 'Restaurant',
-      nameAr: 'مطعم',
+      nameAr: 'Restaurant',
       icon: ChefHat,
       color: 'bg-orange-500',
       description: 'Restaurant POS System'
@@ -14,7 +14,7 @@ const ModeSwitch = ({ currentMode, onModeChange }) => {
     {
       id: 'retail',
       name: 'Retail',
-      nameAr: 'تجزئة',
+      nameAr: 'Retail',
       icon: ShoppingBag,
       color: 'bg-blue-500',
       description: 'Retail POS System'

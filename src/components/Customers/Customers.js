@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Mail, Phone, MapPin, Calendar } from 'lucide-react';
-import { formatPrice, convertToEnglishNumbers } from '../../utils/currency';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { convertToEnglishNumbers, formatPrice } from '../../utils/currency';
 
 const Customers = () => {
   const [selectedCurrency] = useState('USD');
-  const [customers, setCustomers] = useState([
-    // Empty array - client will add their own customers
-  ]);
+  const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    // Load customers from localStorage
+    const savedCustomers = localStorage.getItem('customers');
+    if (savedCustomers) {
+      setCustomers(JSON.parse(savedCustomers));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save customers to localStorage whenever customers change
+    localStorage.setItem('customers', JSON.stringify(customers));
+  }, [customers]);
 
   const [showModal, setShowModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [notification, setNotification] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    taxRate: 0
   });
 
   const filteredCustomers = customers.filter(customer =>
@@ -25,11 +38,16 @@ const Customers = () => {
     customer.phone.includes(searchTerm)
   );
 
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.phone || !formData.address) {
-      alert('Please fill in all required fields!');
+      showNotification('Please fill in all required fields!');
       return;
     }
 
@@ -39,18 +57,19 @@ const Customers = () => {
           ? { ...customer, ...formData }
           : customer
       ));
-      alert('Customer data updated successfully!');
+      showNotification('Customer updated successfully!');
     } else {
       const newCustomer = {
         id: Date.now(),
         ...formData,
+        taxRate: parseFloat(formData.taxRate) || 0,
         totalOrders: 0,
         totalSpent: 0,
         loyaltyPoints: 0,
         lastVisit: new Date().toISOString()
       };
       setCustomers([...customers, newCustomer]);
-      alert('Customer added successfully!');
+      showNotification('Customer added successfully!');
     }
 
     resetForm();
@@ -59,12 +78,12 @@ const Customers = () => {
   const handleDelete = (customerId) => {
     if (window.confirm('Are you sure you want to delete this customer?')) {
       setCustomers(customers.filter(customer => customer.id !== customerId));
-      alert('Customer deleted successfully!');
+      showNotification('Customer deleted successfully!');
     }
   };
 
   const resetForm = () => {
-    setFormData({ name: '', email: '', phone: '', address: '' });
+    setFormData({ name: '', email: '', phone: '', address: '', taxRate: 0 });
     setEditingCustomer(null);
     setShowModal(false);
   };
@@ -75,15 +94,36 @@ const Customers = () => {
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
-      address: customer.address
+      address: customer.address,
+      taxRate: customer.taxRate || 0
     });
     setShowModal(true);
   };
 
+  // Function to update customer data when a sale is made
+  const updateCustomerData = (customerName, orderTotal) => {
+    const updatedCustomers = customers.map(customer => {
+      if (customer.name.toLowerCase() === customerName.toLowerCase()) {
+        return {
+          ...customer,
+          totalOrders: customer.totalOrders + 1,
+          totalSpent: customer.totalSpent + orderTotal,
+          loyaltyPoints: customer.loyaltyPoints + Math.floor(orderTotal / 10), // 1 point per 10 SAR
+          lastVisit: new Date().toISOString()
+        };
+      }
+      return customer;
+    });
+    setCustomers(updatedCustomers);
+  };
+
+  // Make this function available globally for other components
+  window.updateCustomerData = updateCustomerData;
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Customer Management</h1>
           <p className="text-gray-600">Manage your restaurant customers</p>
@@ -92,20 +132,20 @@ const Customers = () => {
           onClick={() => setShowModal(true)}
           className="btn btn-primary"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="mr-2 w-5 h-5" />
           Add Customer
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="card p-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="p-6 card">
           <div className="text-center">
             <p className="text-3xl font-bold text-primary-600">{customers.length}</p>
             <p className="text-sm text-gray-600">Total Customers</p>
           </div>
         </div>
-        <div className="card p-6">
+        <div className="p-6 card">
           <div className="text-center">
             <p className="text-3xl font-bold text-success-600">
               {customers.reduce((sum, customer) => sum + customer.totalOrders, 0)}
@@ -113,7 +153,7 @@ const Customers = () => {
             <p className="text-sm text-gray-600">Total Orders</p>
           </div>
         </div>
-        <div className="card p-6">
+        <div className="p-6 card">
           <div className="text-center">
             <p className="text-3xl font-bold text-warning-600">
               {formatPrice(customers.reduce((sum, customer) => sum + customer.totalSpent, 0), selectedCurrency)}
@@ -121,7 +161,7 @@ const Customers = () => {
             <p className="text-sm text-gray-600">Total Revenue</p>
           </div>
         </div>
-        <div className="card p-6">
+        <div className="p-6 card">
           <div className="text-center">
             <p className="text-3xl font-bold text-secondary-600">
               {customers.length > 0 ? formatPrice(customers.reduce((sum, customer) => sum + customer.totalSpent, 0) / customers.length, selectedCurrency) : formatPrice(0, selectedCurrency)}
@@ -132,55 +172,61 @@ const Customers = () => {
       </div>
 
       {/* Search */}
-      <div className="card p-4">
+      <div className="p-4 card">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 w-5 h-5 text-gray-400 transform -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search customers by name, email, or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input pl-10"
+            className="pl-10 input"
           />
         </div>
       </div>
 
       {/* Customers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredCustomers.map(customer => (
-          <div key={customer.id} className="card p-6">
-            <div className="flex items-start justify-between mb-4">
+          <div key={customer.id} className="p-6 card">
+            <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 text-lg">{customer.name}</h3>
-                <div className="space-y-2 mt-2">
+                <h3 className="text-lg font-semibold text-gray-900">{customer.name}</h3>
+                <div className="mt-2 space-y-2">
                   <div className="flex items-center text-sm text-gray-600">
-                    <Mail className="w-4 h-4 mr-2" />
+                    <Mail className="mr-2 w-4 h-4" />
                     {customer.email}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <Phone className="w-4 h-4 mr-2" />
+                    <Phone className="mr-2 w-4 h-4" />
                     {customer.phone}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
+                    <MapPin className="mr-2 w-4 h-4" />
                     {customer.address}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
+                    <Calendar className="mr-2 w-4 h-4" />
                     Last visit: {convertToEnglishNumbers(new Date(customer.lastVisit).toLocaleDateString())}
                   </div>
+                  {customer.taxRate > 0 && (
+                    <div className="flex items-center text-sm text-green-600">
+                      <span className="mr-2 w-4 h-4 font-bold text-center">%</span>
+                      Tax Rate: {customer.taxRate}%
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Customer Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 p-3 mb-4 bg-gray-50 rounded-lg">
               <div className="text-center">
                 <p className="text-lg font-semibold text-primary-600">{customer.totalOrders}</p>
                 <p className="text-xs text-gray-600">Orders</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-semibold text-success-600">${customer.totalSpent}</p>
+                <p className="text-lg font-semibold text-success-600">{formatPrice(customer.totalSpent)}</p>
                 <p className="text-xs text-gray-600">Spent</p>
               </div>
             </div>
@@ -191,9 +237,9 @@ const Customers = () => {
                 <span className="text-sm text-gray-600">Loyalty Points</span>
                 <span className="text-sm font-semibold text-secondary-600">{customer.loyaltyPoints}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div 
-                  className="bg-secondary-600 h-2 rounded-full" 
+                  className="h-2 rounded-full bg-secondary-600" 
                   style={{ width: `${Math.min((customer.loyaltyPoints / 250) * 100, 100)}%` }}
                 ></div>
               </div>
@@ -203,16 +249,16 @@ const Customers = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => handleEdit(customer)}
-                className="btn btn-secondary flex-1"
+                className="flex-1 btn btn-secondary"
               >
-                <Edit className="w-4 h-4 mr-1" />
+                <Edit className="mr-1 w-4 h-4" />
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(customer.id)}
-                className="btn btn-danger flex-1"
+                className="flex-1 btn btn-danger"
               >
-                <Trash2 className="w-4 h-4 mr-1" />
+                <Trash2 className="mr-1 w-4 h-4" />
                 Delete
               </button>
             </div>
@@ -222,15 +268,15 @@ const Customers = () => {
 
       {/* Add/Edit Customer Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="flex fixed inset-0 z-50 justify-center items-center bg-gray-600 bg-opacity-75">
+          <div className="p-6 w-full max-w-md bg-white rounded-xl">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
               {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Full Name
                 </label>
                 <input
@@ -243,7 +289,7 @@ const Customers = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Email Address
                 </label>
                 <input
@@ -256,7 +302,7 @@ const Customers = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Phone Number
                 </label>
                 <input
@@ -269,7 +315,7 @@ const Customers = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Address
                 </label>
                 <textarea
@@ -281,17 +327,32 @@ const Customers = () => {
                 />
               </div>
 
-              <div className="flex space-x-3 pt-4">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Tax Rate (%)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.taxRate}
+                  onChange={(e) => setFormData({...formData, taxRate: e.target.value})}
+                  className="input"
+                />
+              </div>
+
+              <div className="flex pt-4 space-x-3">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="btn btn-secondary flex-1"
+                  className="flex-1 btn btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary flex-1"
+                  className="flex-1 btn btn-primary"
                 >
                   {editingCustomer ? 'Update' : 'Add'} Customer
                 </button>

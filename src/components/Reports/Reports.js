@@ -30,6 +30,7 @@ ChartJS.register(
 const Reports = () => {
   const [dateRange, setDateRange] = useState('week');
   const [reportType, setReportType] = useState('sales');
+  const [notification, setNotification] = useState('');
 
   // Sample data for charts
   const salesData = {
@@ -163,7 +164,12 @@ const Reports = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
     
-    alert('Report exported successfully!');
+    showNotification('Report exported successfully!');
+  };
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
   };
 
   return (

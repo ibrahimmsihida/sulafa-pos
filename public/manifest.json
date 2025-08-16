@@ -1,0 +1,64 @@
+{
+  "name": "SULAFA POS - Restaurant Management System",
+  "short_name": "SULAFA POS",
+  "description": "Professional Restaurant Point of Sale System by SULAFA PVT LTD",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity", "food"],
+  "icons": [
+    {
+      "src": "/images/sulafa-logo-circle.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/sulafa-logo-circle.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/sulafa-pos-logo.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "platform": "wide",
+      "label": "SULAFA POS Dashboard"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "POS System",
+      "short_name": "POS",
+      "description": "Quick access to POS system",
+      "url": "/pos",
+      "icons": [
+        {
+          "src": "/images/sulafa-logo-circle.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "short_name": "Reports",
+      "description": "View sales reports",
+      "url": "/reports",
+      "icons": [
+        {
+          "src": "/images/sulafa-logo-circle.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

@@ -5,10 +5,20 @@ import { convertToEnglishNumbers } from '../../utils/currency';
 
 const Analytics = () => {
   const [timeRange, setTimeRange] = useState('week');
+  const [notification, setNotification] = useState('');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showDateRangeModal, setShowDateRangeModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedSection, setSelectedSection] = useState('');
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
   
   // Functions for button actions
   const handleRefresh = () => {
-    alert('Data updated successfully!');
+    showNotification('Data refreshed successfully!');
     console.log('Refreshing analytics data...');
   };
 
@@ -34,27 +44,24 @@ const Analytics = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
     
-    alert('Analytics report exported successfully!');
+    showNotification('Analytics report exported successfully!');
   };
 
   const handleViewDetails = (section) => {
-    alert(`View details for ${section}`);
-    console.log(`Viewing details for: ${section}`);
+    setSelectedSection(section);
+    setShowDetailsModal(true);
   };
 
   const handleViewAll = () => {
-    alert('View all products');
-    console.log('Viewing all products');
+    setShowDetailsModal(true);
   };
 
   const handleFilter = () => {
-    alert('Opening filter dialog');
-    console.log('Opening filter dialog');
+    setShowFilterModal(true);
   };
 
   const handleCustomDateRange = () => {
-    alert('Customize time period');
-    console.log('Opening custom date range picker');
+    setShowDateRangeModal(true);
   };
   
   // Analytics data

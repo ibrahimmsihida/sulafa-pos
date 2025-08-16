@@ -2,23 +2,34 @@ import React, { useState } from 'react';
 import { ShoppingCart, Globe, Settings, TrendingUp, Package, Users, DollarSign } from 'lucide-react';
 
 const Ecommerce = () => {
+  const [notification, setNotification] = useState('');
+  const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState('');
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
   // Functions for button actions
   const handlePlatformSettings = () => {
-    alert('Opening platform settings');
+    setShowPlatformModal(true);
   };
 
   const handleConnectNewPlatform = () => {
-    alert('Connecting new platform');
+    setShowConnectModal(true);
   };
 
   const handlePlatformSpecificSettings = (platformName) => {
-    alert(`Opening settings for ${platformName}`);
+    setSelectedPlatform(platformName);
+    setShowPlatformModal(true);
   };
 
   const handleSyncPlatform = (platformName) => {
-    alert(`Syncing ${platformName}...`);
+    showNotification(`Syncing ${platformName}...`);
     setTimeout(() => {
-      alert(`Successfully synced ${platformName}!`);
+      showNotification(`${platformName} synced successfully!`);
     }, 2000);
   };
   const [platforms] = useState([

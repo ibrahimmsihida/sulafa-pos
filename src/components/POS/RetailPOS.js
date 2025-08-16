@@ -198,10 +198,14 @@ const RetailPOSContent = () => {
 
   // Generate invoice with improved handling
   const generateInvoice = useCallback(async () => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * (taxRate / 100);
+    const total = subtotal + tax;
+    
     const sale = {
       id: Date.now(),
       items: cart,
-      total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 + taxRate / 100),
+      total: total,
       customer: selectedCustomer,
       paymentMethod,
       date: new Date()
@@ -211,6 +215,85 @@ const RetailPOSContent = () => {
     if (success) {
       setDailySales(prev => [...prev, sale]);
       setLastInvoice(sale);
+      
+      // Add bill to Bill History
+      const billData = {
+        billNumber: `BILL-${sale.id}`,
+        customerName: selectedCustomer?.name || 'Walk-in Customer',
+        customerPhone: selectedCustomer?.phone || 'N/A',
+        items: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity
+        })),
+        subtotal: subtotal,
+        tax: tax,
+        discount: 0,
+        total: total,
+        paymentMethod: paymentMethod,
+        status: 'completed',
+        cashierName: 'Current User',
+        tableNumber: Math.floor(Math.random() * 20) + 1,
+        orderType: 'retail'
+      };
+      
+      // Save to Bill History
+      const existingBills = JSON.parse(localStorage.getItem('billHistory') || '[]');
+      const updatedBills = [...existingBills, billData];
+      localStorage.setItem('billHistory', JSON.stringify(updatedBills));
+      
+      // Update customer data if customer exists
+      if (selectedCustomer?.name && selectedCustomer.name.trim() !== '' && selectedCustomer.name !== 'Walk-in Customer') {
+        if (window.updateCustomerData) {
+          window.updateCustomerData(selectedCustomer.name, total);
+        }
+      }
+      
+      // Add transaction to current register session
+      const registerSessions = JSON.parse(localStorage.getItem('registerSessions') || '[]');
+      const activeSession = registerSessions.find(session => session.status === 'open');
+      if (activeSession) {
+        const transaction = {
+          id: Date.now(),
+          type: 'sale',
+          amount: total,
+          description: `Sale - Bill ${billData.billNumber}`,
+          timestamp: new Date().toISOString(),
+          paymentMethod: paymentMethod
+        };
+        
+        activeSession.transactions = activeSession.transactions || [];
+        activeSession.transactions.push(transaction);
+        activeSession.totalSales = (activeSession.totalSales || 0) + total;
+        
+        if (paymentMethod === 'cash') {
+          activeSession.currentCash = (activeSession.currentCash || activeSession.openingAmount) + total;
+        }
+        
+        localStorage.setItem('registerSessions', JSON.stringify(registerSessions));
+      }
+      
+      // If payment is online, add to Online Payments
+      if (paymentMethod === 'card' || paymentMethod === 'online') {
+        const paymentData = {
+          transactionId: `txn_${sale.id}`,
+          customerName: selectedCustomer?.name || 'Walk-in Customer',
+          customerEmail: selectedCustomer?.email || 'customer@example.com',
+          amount: total,
+          currency: 'USD',
+          status: 'completed',
+          paymentMethod: paymentMethod === 'card' ? 'credit_card' : 'paypal',
+          description: `Payment for Bill ${billData.billNumber}`,
+          fees: total * 0.029, // 2.9% processing fee
+          netAmount: total * 0.971
+        };
+        
+        const existingPayments = JSON.parse(localStorage.getItem('onlinePayments') || '[]');
+        const updatedPayments = [...existingPayments, paymentData];
+        localStorage.setItem('onlinePayments', JSON.stringify(updatedPayments));
+      }
+      
       setShowCheckout(false);
       dispatch({ type: 'CLEAR_CART' });
     }

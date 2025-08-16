@@ -44,11 +44,18 @@ const Products = () => {
     }
   };
 
+  const [notification, setNotification] = useState('');
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(''), 3000);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
     if (!formData.name || !formData.price || !formData.category) {
-      alert('Please fill in all required fields!');
+      showNotification('Please fill in all required fields!');
       return;
     }
     
@@ -64,7 +71,7 @@ const Products = () => {
             }
           : product
       ));
-      alert('Product updated successfully!');
+      showNotification('Product updated successfully!');
     } else {
       const newProduct = {
         ...formData,
@@ -74,7 +81,7 @@ const Products = () => {
         image: formData.imagePreview || '📦'
       };
       setProducts([...products, newProduct]);
-      alert('Product added successfully!');
+      showNotification('Product added successfully!');
     }
     resetForm();
   };
@@ -110,7 +117,7 @@ const Products = () => {
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       setProducts(products.filter(product => product.id !== id));
-      alert('Product deleted successfully!');
+      showNotification('Product deleted successfully!');
     }
   };
 
