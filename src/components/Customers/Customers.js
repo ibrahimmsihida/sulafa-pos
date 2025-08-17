@@ -73,7 +73,7 @@ const Customers = () => {
           ? { ...customer, ...formData }
           : customer
       ));
-      setNotification('تم تحديث بيانات العميل بنجاح!');
+      setNotification('Customer data updated successfully!');
     } else {
       const newCustomer = {
         id: Date.now(),
@@ -84,7 +84,7 @@ const Customers = () => {
         loyaltyPoints: 0
       };
       setCustomers([...customers, newCustomer]);
-      setNotification('تم إضافة العميل بنجاح!');
+      setNotification('Customer added successfully!');
     }
     
     resetForm();
@@ -105,9 +105,9 @@ const Customers = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا العميل؟')) {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
       setCustomers(customers.filter(customer => customer.id !== id));
-      setNotification('تم حذف العميل بنجاح!');
+      setNotification('Customer deleted successfully!');
       setTimeout(() => setNotification(''), 3000);
     }
   };
