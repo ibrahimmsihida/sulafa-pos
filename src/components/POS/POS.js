@@ -188,7 +188,15 @@ const POS = () => {
     // Simulate order processing
     const orderNumber = '#' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * (taxRate / 100);
+    
+    // Calculate tax based on individual product tax rates or customer tax rate
+    const customerTaxRate = selectedCustomer?.taxRate || taxRate;
+    const tax = cart.reduce((totalTax, item) => {
+      const itemTotal = item.price * item.quantity;
+      const itemTaxRate = item.taxExempt ? 0 : (item.taxRate || customerTaxRate);
+      return totalTax + (itemTotal * (itemTaxRate / 100));
+    }, 0);
+    
     const total = subtotal + tax;
     
     // Add bill to Bill History
@@ -196,6 +204,8 @@ const POS = () => {
       billNumber: `BILL-${Date.now()}`,
       customerName: selectedCustomer?.name || 'Walk-in Customer',
       customerPhone: selectedCustomer?.phone || 'N/A',
+      customerTaxId: selectedCustomer?.taxId || '',
+      customerTaxRate: selectedCustomer?.taxRate || taxRate,
       items: cart.map(item => ({
         name: item.name,
         quantity: item.quantity,
@@ -506,6 +516,33 @@ const POS = () => {
                   placeholder="Enter customer name"
                   value={selectedCustomer?.name || ''}
                   onChange={(e) => setSelectedCustomer({...selectedCustomer, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Customer Tax ID (Optional)
+                </label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="Enter tax ID"
+                  value={selectedCustomer?.taxId || ''}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, taxId: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Customer Tax Rate (%)
+                </label>
+                <input 
+                  type="number" 
+                  className="input" 
+                  placeholder="15"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={selectedCustomer?.taxRate || 15}
+                  onChange={(e) => setSelectedCustomer({...selectedCustomer, taxRate: parseFloat(e.target.value) || 15})}
                 />
               </div>
               <div>

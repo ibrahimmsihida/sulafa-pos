@@ -199,7 +199,15 @@ const RetailPOSContent = () => {
   // Generate invoice with improved handling
   const generateInvoice = useCallback(async () => {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * (taxRate / 100);
+    
+    // Calculate tax based on individual product tax rates or customer tax rate
+    const customerTaxRate = selectedCustomer?.taxRate || taxRate;
+    const tax = cart.reduce((totalTax, item) => {
+      const itemTotal = item.price * item.quantity;
+      const itemTaxRate = item.taxExempt ? 0 : (item.taxRate || customerTaxRate);
+      return totalTax + (itemTotal * (itemTaxRate / 100));
+    }, 0);
+    
     const total = subtotal + tax;
     
     const sale = {
@@ -220,7 +228,9 @@ const RetailPOSContent = () => {
       const billData = {
         billNumber: `BILL-${sale.id}`,
         customerName: selectedCustomer?.name || 'Walk-in Customer',
-        customerPhone: selectedCustomer?.phone || 'N/A',
+      customerPhone: selectedCustomer?.phone || 'N/A',
+      customerTaxId: selectedCustomer?.taxId || '',
+      customerTaxRate: selectedCustomer?.taxRate || taxRate,
         items: cart.map(item => ({
           name: item.name,
           quantity: item.quantity,
@@ -309,7 +319,14 @@ const RetailPOSContent = () => {
 
   // Calculate totals
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const tax = subtotal * (taxRate / 100);
+  
+  // Calculate tax based on individual product tax rates
+  const tax = cart.reduce((totalTax, item) => {
+    const itemTotal = item.price * item.quantity;
+    const itemTaxRate = item.taxExempt ? 0 : (item.taxRate || taxRate);
+    return totalTax + (itemTotal * (itemTaxRate / 100));
+  }, 0);
+  
   const total = subtotal + tax;
 
   return (

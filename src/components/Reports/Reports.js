@@ -30,6 +30,58 @@ ChartJS.register(
 const Reports = () => {
   const [dateRange, setDateRange] = useState('week');
   const [reportType, setReportType] = useState('sales');
+  const [dailyReportDate, setDailyReportDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dailyReportsData, setDailyReportsData] = useState({
+    sales: {
+      totalSales: 2450,
+      totalOrders: 67,
+      averageOrder: 36.57,
+      cashSales: 1200,
+      cardSales: 950,
+      onlineSales: 300
+    },
+    products: {
+      topSelling: [
+        { name: 'Chicken Burger', quantity: 15, revenue: 225 },
+        { name: 'Pizza Margherita', quantity: 12, revenue: 180 },
+        { name: 'Caesar Salad', quantity: 10, revenue: 120 },
+        { name: 'Pasta Carbonara', quantity: 8, revenue: 160 }
+      ],
+      lowStock: [
+        { name: 'Tomatoes', currentStock: 5, minStock: 20 },
+        { name: 'Cheese', currentStock: 8, minStock: 15 }
+      ]
+    },
+    customers: {
+      newCustomers: 12,
+      returningCustomers: 45,
+      totalCustomers: 57
+    },
+    expenses: {
+      totalExpenses: 450,
+      categories: [
+        { name: 'Food Supplies', amount: 200 },
+        { name: 'Utilities', amount: 150 },
+        { name: 'Staff', amount: 100 }
+      ]
+    }
+  });
+  const [gstData, setGstData] = useState({
+    totalGst: 4320,
+    gstCollected: 3890,
+    gstPaid: 2150,
+    gstBalance: 1740
+  });
+  const [expensesData, setExpensesData] = useState({
+    totalExpenses: 12500,
+    categories: [
+      { name: 'Food Supplies', amount: 5200, percentage: 41.6 },
+      { name: 'Staff Salaries', amount: 3800, percentage: 30.4 },
+      { name: 'Utilities', amount: 1200, percentage: 9.6 },
+      { name: 'Rent', amount: 1500, percentage: 12.0 },
+      { name: 'Marketing', amount: 800, percentage: 6.4 }
+    ]
+  });
   const [notification, setNotification] = useState('');
 
   // Sample data for charts
@@ -308,6 +360,175 @@ const Reports = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Reports System */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Daily Reports</h3>
+          <input
+            type="date"
+            value={dailyReportDate}
+            onChange={(e) => setDailyReportDate(e.target.value)}
+            className="input w-40"
+          />
+        </div>
+        
+        {/* Daily Sales Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-blue-600">Total Sales</p>
+            <p className="text-2xl font-bold text-blue-900">${dailyReportsData.sales.totalSales}</p>
+            <p className="text-sm text-blue-700">{dailyReportsData.sales.totalOrders} orders</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-green-600">Average Order</p>
+            <p className="text-2xl font-bold text-green-900">${dailyReportsData.sales.averageOrder}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-purple-600">New Customers</p>
+            <p className="text-2xl font-bold text-purple-900">{dailyReportsData.customers.newCustomers}</p>
+            <p className="text-sm text-purple-700">of {dailyReportsData.customers.totalCustomers} total</p>
+          </div>
+        </div>
+
+        {/* Payment Methods Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-3">Payment Methods</h4>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Cash</span>
+                <span className="font-semibold">${dailyReportsData.sales.cashSales}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Card</span>
+                <span className="font-semibold">${dailyReportsData.sales.cardSales}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Online</span>
+                <span className="font-semibold">${dailyReportsData.sales.onlineSales}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-3">Top Selling Products</h4>
+            <div className="space-y-2">
+              {dailyReportsData.products.topSelling.slice(0, 4).map((product, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span className="text-gray-600">{product.name}</span>
+                  <span className="font-semibold">{product.quantity} sold</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Low Stock Alert */}
+        {dailyReportsData.products.lowStock.length > 0 && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
+            <h4 className="font-semibold text-red-800 mb-2">⚠️ Low Stock Alert</h4>
+            <div className="space-y-1">
+              {dailyReportsData.products.lowStock.map((item, index) => (
+                <p key={index} className="text-sm text-red-700">
+                  {item.name}: {item.currentStock} remaining (min: {item.minStock})
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Daily Expenses */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-gray-900 mb-3">Daily Expenses: ${dailyReportsData.expenses.totalExpenses}</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {dailyReportsData.expenses.categories.map((expense, index) => (
+              <div key={index} className="flex justify-between">
+                <span className="text-gray-600">{expense.name}</span>
+                <span className="font-semibold">${expense.amount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* GST Reports */}
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">GST Reports</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-blue-600">Total GST</p>
+            <p className="text-2xl font-bold text-blue-900">${gstData.totalGst}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-green-600">GST Collected</p>
+            <p className="text-2xl font-bold text-green-900">${gstData.gstCollected}</p>
+          </div>
+          <div className="bg-red-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-red-600">GST Paid</p>
+            <p className="text-2xl font-bold text-red-900">${gstData.gstPaid}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <p className="text-sm font-medium text-purple-600">GST Balance</p>
+            <p className="text-2xl font-bold text-purple-900">${gstData.gstBalance}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Expenses Reports */}
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Expenses Report</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+              <p className="text-3xl font-bold text-gray-900">${expensesData.totalExpenses}</p>
+            </div>
+            <div className="space-y-3">
+              {expensesData.categories.map((category, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{category.name}</p>
+                    <p className="text-sm text-gray-600">{category.percentage}% of total</p>
+                  </div>
+                  <p className="font-semibold text-blue-600">${category.amount}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Doughnut 
+              data={{
+                labels: expensesData.categories.map(cat => cat.name),
+                datasets: [{
+                  data: expensesData.categories.map(cat => cat.amount),
+                  backgroundColor: [
+                    '#3B82F6',
+                    '#10B981',
+                    '#F59E0B',
+                    '#EF4444',
+                    '#8B5CF6'
+                  ],
+                  borderWidth: 2,
+                  borderColor: '#ffffff'
+                }]
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      padding: 20,
+                      usePointStyle: true
+                    }
+                  }
+                }
+              }}
+            />
           </div>
         </div>
       </div>

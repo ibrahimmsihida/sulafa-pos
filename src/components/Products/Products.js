@@ -20,7 +20,9 @@ const Products = () => {
     stock: '',
     description: '',
     image: null,
-    imagePreview: null
+    imagePreview: null,
+    taxRate: 15,
+    taxExempt: false
   });
 
   const filteredProducts = products.filter(product => {
@@ -67,7 +69,9 @@ const Products = () => {
               id: editingProduct.id, 
               price: parseFloat(formData.price), 
               stock: parseInt(formData.stock) || 0,
-              image: formData.imagePreview || editingProduct.image
+              image: formData.imagePreview || editingProduct.image,
+              taxRate: formData.taxExempt ? 0 : parseFloat(formData.taxRate) || 0,
+              taxExempt: formData.taxExempt
             }
           : product
       ));
@@ -78,7 +82,9 @@ const Products = () => {
         id: Date.now(),
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock) || 0,
-        image: formData.imagePreview || '📦'
+        image: formData.imagePreview || '📦',
+        taxRate: formData.taxExempt ? 0 : parseFloat(formData.taxRate) || 0,
+        taxExempt: formData.taxExempt
       };
       setProducts([...products, newProduct]);
       showNotification('Product added successfully!');
@@ -94,7 +100,9 @@ const Products = () => {
       stock: '', 
       description: '',
       image: null,
-      imagePreview: null
+      imagePreview: null,
+      taxRate: 15,
+      taxExempt: false
     });
     setEditingProduct(null);
     setShowModal(false);
@@ -322,6 +330,39 @@ const Products = () => {
                   placeholder="Product description..."
                 />
               </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="taxExempt"
+                    checked={formData.taxExempt}
+                    onChange={(e) => setFormData({...formData, taxExempt: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <label htmlFor="taxExempt" className="text-sm font-medium text-gray-700">
+                    Tax Exempt Product
+                  </label>
+                </div>
+              </div>
+
+              {!formData.taxExempt && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tax Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    value={formData.taxRate}
+                    onChange={(e) => setFormData({...formData, taxRate: parseFloat(e.target.value) || 0})}
+                    className="input"
+                    placeholder="15"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

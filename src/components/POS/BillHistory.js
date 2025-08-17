@@ -586,6 +586,12 @@ const BillHistory = () => {
                   <div className="space-y-2">
                     <p><span className="font-medium">Name:</span> {selectedBill.customerName}</p>
                     <p><span className="font-medium">Phone:</span> {selectedBill.customerPhone}</p>
+                    {selectedBill.customerTaxId && (
+                      <p><span className="font-medium">Tax ID:</span> {selectedBill.customerTaxId}</p>
+                    )}
+                    {selectedBill.customerTaxRate && (
+                      <p><span className="font-medium">Tax Rate:</span> {selectedBill.customerTaxRate}%</p>
+                    )}
                   </div>
                 </div>
 
