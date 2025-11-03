@@ -1,20 +1,23 @@
 // Currency utility for SULAFA POS System
 export const CURRENCIES = {
+  USD: { symbol: '$', name: 'US Dollar', code: 'USD' },
   MVR: { symbol: 'MVR', name: 'Maldivian Rufiyaa', code: 'MVR' }
 };
 
 // Get currency based on user's location or preference
-export const getCurrencyByRegion = (region = 'MV') => {
+export const getCurrencyByRegion = (region = 'US') => {
   const regionCurrencyMap = {
+    'US': 'USD',
+    'USA': 'USD',
     'MV': 'MVR',
     'MALDIVES': 'MVR'
   };
   
-  return regionCurrencyMap[region] || 'MVR';
+  return regionCurrencyMap[region] || 'USD';
 };
 
 // Format price with currency
-export const formatPrice = (amount, currencyCode = 'MVR') => {
+export const formatPrice = (amount, currencyCode = 'USD') => {
   const currency = CURRENCIES[currencyCode];
   if (!currency) return `${amount}`;
   

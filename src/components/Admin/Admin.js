@@ -7,7 +7,7 @@ const Admin = () => {
   const [activeSettingsTab, setActiveSettingsTab] = useState('modules');
   const [selectedPlan, setSelectedPlan] = useState('starter');
   const [settings, setSettings] = useState({
-    currency: 'MVR',
+    currency: 'USD',
     timezone: 'Indian/Maldives',
     uniqueCustomerMobile: true,
     optimizeBillHistory: false,
@@ -55,11 +55,12 @@ const Admin = () => {
   const [showDenominationModal, setShowDenominationModal] = useState(false);
   const [editingDenomination, setEditingDenomination] = useState(null);
   const [cashDenominations, setCashDenominations] = useState([
-    { id: 1, name: 'MAD 1', value: 1.00, type: 'Coin', currency: 'MAD' },
-    { id: 2, name: 'MAD 10', value: 10.00, type: 'Note', currency: 'MAD' },
-    { id: 3, name: 'MAD 20', value: 20.00, type: 'Note', currency: 'MAD' },
-    { id: 4, name: 'MAD 50', value: 50.00, type: 'Note', currency: 'MAD' },
-    { id: 5, name: 'MAD 100', value: 100.00, type: 'Note', currency: 'MAD' }
+    { id: 1, name: '$1', value: 1.00, type: 'Note', currency: 'USD' },
+    { id: 2, name: '$5', value: 5.00, type: 'Note', currency: 'USD' },
+    { id: 3, name: '$10', value: 10.00, type: 'Note', currency: 'USD' },
+    { id: 4, name: '$20', value: 20.00, type: 'Note', currency: 'USD' },
+    { id: 5, name: '$50', value: 50.00, type: 'Note', currency: 'USD' },
+    { id: 6, name: '$100', value: 100.00, type: 'Note', currency: 'USD' }
   ]);
 
   // Modal states for new sections
@@ -911,14 +912,14 @@ const Admin = () => {
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                   Currency
                 </label>
-                <p className="mb-2 text-sm text-gray-600">The company currency code to be used through out the system. Eg: $, MVR</p>
+                <p className="mb-2 text-sm text-gray-600">The company currency code to be used through out the system. Eg: $, USD</p>
                 <select 
                   value={settings.currency}
                   onChange={(e) => setSettings({...settings, currency: e.target.value})}
                   className="px-3 py-2 w-full rounded border border-gray-300"
                 >
-                  <option value="MVR">MVR</option>
                   <option value="USD">USD</option>
+                  <option value="MVR">MVR</option>
                   <option value="EUR">EUR</option>
                 </select>
               </div>

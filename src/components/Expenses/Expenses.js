@@ -65,9 +65,9 @@ const Expenses = () => {
       { id: 5, name: 'Chicken', category: 'Meat', quantity: 30, unit: 'kg', cost: 85.50, supplier: 'Fresh Meat Co.', lastUpdated: '2024-01-11' }
     ];
 
-    const csvHeader = 'ID,Name,Category,Quantity,Unit,Cost (MVR),Supplier,Last Updated\n';
-    const csvContent = inventoryItems.map(item => 
-      `${item.id},${item.name},${item.category},${item.quantity},${item.unit},${formatPrice(item.cost, 'MVR')},${item.supplier},${item.lastUpdated}`
+    const csvHeader = 'ID,Name,Category,Quantity,Unit,Cost (USD),Supplier,Last Updated\n';
+    const csvContent = expenses.map(item => 
+      `${item.id},${item.name},${item.category},${item.quantity},${item.unit},${formatPrice(item.cost, 'USD')},${item.supplier},${item.lastUpdated}`
     ).join('\n');
     
     const fullCsvContent = csvHeader + csvContent;
